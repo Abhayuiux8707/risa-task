@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MessageSquare, User, Building, DollarSign, Star, ThumbsUp, AlertTriangle, BookOpen, Send, Bot, Sparkles, Zap, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, MessageSquare, User, Building, DollarSign, Star, ThumbsUp, AlertTriangle, BookOpen, Send, Bot, Sparkles, Zap, CheckCircle2 } from '../ui/Icons';
 
 const TicketWorkspace: React.FC = () => {
   return (

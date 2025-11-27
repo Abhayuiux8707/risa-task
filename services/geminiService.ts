@@ -69,45 +69,65 @@ let currentMode: WorkspaceMode | null = null;
 
 const getClient = () => {
   if (!aiClient) {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      console.warn("API_KEY not found.");
+    let apiKey = '';
+    // Extremely safe check for process.env to prevent ReferenceError in browsers
+    try {
+        // @ts-ignore
+        if (typeof process !== 'undefined' && process && process.env) {
+            // @ts-ignore
+            apiKey = process.env.API_KEY || '';
+        }
+    } catch (e) {
+        console.warn("Environment check failed, using fallback.", e);
     }
+
+    if (!apiKey) {
+      console.warn("API_KEY not found. Agent features will operate in demo mode.");
+    }
+    
+    // Fallback dummy key to prevent crash if class constructor requires string
     aiClient = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' }); 
   }
   return aiClient;
 };
 
 export const initializeChat = async (mode: WorkspaceMode, contextData: AgentContext) => {
-  const ai = getClient();
-  currentMode = mode;
-  
-  const modelName = 'gemini-2.5-flash'; 
+  try {
+    const ai = getClient();
+    currentMode = mode;
+    
+    const modelName = 'gemini-2.5-flash'; 
 
-  chatSession = ai.chats.create({
-    model: modelName,
-    config: {
-      systemInstruction: getSystemInstruction(mode),
-      temperature: 0.3, 
+    chatSession = ai.chats.create({
+        model: modelName,
+        config: {
+        systemInstruction: getSystemInstruction(mode),
+        temperature: 0.3, 
+        }
+    });
+
+    // Inject initial context silently
+    if (contextData) {
+        await chatSession.sendMessage({
+        message: `[SYSTEM CONTEXT INJECTION]
+        Current Mode: ${mode}
+        Current Context: ${JSON.stringify(contextData)}
+        `
+        });
     }
-  });
 
-  // Inject initial context silently
-  if (contextData) {
-     await chatSession.sendMessage({
-       message: `[SYSTEM CONTEXT INJECTION]
-       Current Mode: ${mode}
-       Current Context: ${JSON.stringify(contextData)}
-       `
-     });
+    return chatSession;
+  } catch (err) {
+      console.error("Failed to initialize chat:", err);
+      // Return a mock session or null to prevent app crash
+      return null as any; 
   }
-
-  return chatSession;
 };
 
 export const sendMessageToAgent = async (message: string): Promise<string> => {
   if (!chatSession) {
-    throw new Error("Chat session not initialized.");
+    // If session failed to init, return a graceful error message instead of throwing
+    return "Agent is offline (Check API Configuration).";
   }
   
   try {

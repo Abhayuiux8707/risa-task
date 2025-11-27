@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, XAxis, Tooltip, CartesianGrid, AreaChart, Area, YAxis } from 'recharts';
-import { Smile, Clock, TrendingUp, Users } from 'lucide-react';
+import { Smile, Clock, TrendingUp, Users } from '../ui/Icons';
 
 const csatData = [
   { time: 'Mon', score: 4.5 },

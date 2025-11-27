@@ -42,7 +42,12 @@ import {
   TrendingUp,
   Shield,
   Check,
-  ChevronRight
+  ChevronRight,
+  User,
+  Building,
+  DollarSign,
+  Star,
+  Send
 } from 'lucide-react';
 
 export {
@@ -88,5 +93,10 @@ export {
   TrendingUp,
   Shield,
   Check,
-  ChevronRight
+  ChevronRight,
+  User,
+  Building,
+  DollarSign,
+  Star,
+  Send
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Inbox, AlertTriangle, Clock, Smile, Meh, Frown, CheckCircle2 } from 'lucide-react';
+import {  Inbox, AlertTriangle, Clock, Smile, Meh, Frown, CheckCircle2 } from '../ui/Icons';
 import { Ticket } from '../../types';
 
 // Mock Ticket Data
