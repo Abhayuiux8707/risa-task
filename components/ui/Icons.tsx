@@ -47,7 +47,8 @@ import {
   Building,
   DollarSign,
   Star,
-  Send
+  Send,
+  MousePointerClick
 } from 'lucide-react';
 
 export {
@@ -98,5 +99,6 @@ export {
   Building,
   DollarSign,
   Star,
-  Send
+  Send,
+  MousePointerClick
 };
