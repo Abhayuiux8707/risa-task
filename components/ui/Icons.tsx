@@ -48,7 +48,13 @@ import {
   DollarSign,
   Star,
   Send,
-  MousePointerClick
+  MousePointerClick,
+  Layers,
+  Hash,
+  Paperclip,
+  ChevronDown,
+  Server,
+  FileText
 } from 'lucide-react';
 
 export {
@@ -100,5 +106,11 @@ export {
   DollarSign,
   Star,
   Send,
-  MousePointerClick
+  MousePointerClick,
+  Layers,
+  Hash,
+  Paperclip,
+  ChevronDown,
+  Server,
+  FileText
 };

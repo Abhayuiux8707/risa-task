@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { WorkspaceMode } from '../types';
-import AgentSidebar from './AgentSidebar';
-import QueueWorkspace from './workspaces/ExperimentWorkspace'; // Mapped to Queue
-import TicketWorkspace from './workspaces/TriageWorkspace'; // Mapped to Ticket
-import AnalyticsWorkspace from './workspaces/ReleaseWorkspace'; // Mapped to Analytics
-import { Activity, AlertTriangle, MessageSquare, Search, Box, Settings, ArrowLeft, Bot, Inbox, BookOpen, Users } from './ui/Icons';
+import LeftRail from './LeftRail';
+import RightRail from './RightRail';
+import QueueWorkspace from './workspaces/ExperimentWorkspace'; 
+import TicketWorkspace from './workspaces/TriageWorkspace'; 
+import AnalyticsWorkspace from './workspaces/ReleaseWorkspace'; 
+import EscalationWorkspace from './workspaces/EscalationWorkspace';
+import { Search, ArrowLeft, Bot, Command } from './ui/Icons';
 
 interface DashboardOverlayProps {
     isOpen: boolean;
@@ -14,6 +16,7 @@ interface DashboardOverlayProps {
 
 const DashboardOverlay: React.FC<DashboardOverlayProps> = ({ isOpen, onClose, initialMode }) => {
   const [activeMode, setActiveMode] = useState<WorkspaceMode>(initialMode);
+  const [intentState, setIntentState] = useState<'idle' | 'listening' | 'processing'>('idle');
 
   useEffect(() => {
     if (isOpen) {
@@ -30,6 +33,8 @@ const DashboardOverlay: React.FC<DashboardOverlayProps> = ({ isOpen, onClose, in
         return { ticketId: '#4492', customer: 'Acme Corp', tier: 'Enterprise', sentiment: -0.6 };
       case WorkspaceMode.ANALYTICS:
         return { csat: 4.2, responseTime: '45m', trend: 'down' };
+      case WorkspaceMode.ESCALATION:
+        return { incidentId: 'new', severity: 'high' };
       default:
         return {};
     }
@@ -38,18 +43,15 @@ const DashboardOverlay: React.FC<DashboardOverlayProps> = ({ isOpen, onClose, in
   const renderWorkspace = () => {
     switch (activeMode) {
       case WorkspaceMode.QUEUE:
-        return <QueueWorkspace />; // Maps to ExperimentWorkspace file
+        return <QueueWorkspace />; 
       case WorkspaceMode.TICKET:
-        return <TicketWorkspace />; // Maps to TriageWorkspace file
+        return <TicketWorkspace />; 
       case WorkspaceMode.ANALYTICS:
-        return <AnalyticsWorkspace />; // Maps to ReleaseWorkspace file
+        return <AnalyticsWorkspace />; 
+      case WorkspaceMode.ESCALATION:
+        return <EscalationWorkspace />;
       case WorkspaceMode.KNOWLEDGE:
-        return (
-            <div className="flex-1 flex items-center justify-center bg-slate-50 text-slate-400 font-mono flex-col gap-4">
-                <BookOpen size={48} className="text-slate-300" />
-                <span>Knowledge Base Indexing...</span>
-            </div>
-        );
+        return <div className="flex-1 bg-slate-50 flex items-center justify-center text-slate-400">Knowledge Base Indexing...</div>;
       default:
         return <QueueWorkspace />;
     }
@@ -60,86 +62,74 @@ const DashboardOverlay: React.FC<DashboardOverlayProps> = ({ isOpen, onClose, in
   return (
     <div className="absolute inset-0 z-40 bg-slate-50 text-slate-800 font-sans flex flex-col animate-in slide-in-from-bottom-20 fade-in duration-500">
       
-      {/* simplified Top Bar */}
-      <div className="h-16 flex items-center px-6 justify-between shrink-0 z-10 bg-white/80 backdrop-blur-sm border-b border-slate-200">
-        <div className="flex items-center gap-6">
-          {/* Back Button */}
+      {/* Top Bar (Browser Shell) */}
+      <div className="h-14 flex items-center px-4 justify-between shrink-0 z-30 bg-white border-b border-slate-200 shadow-sm relative">
+        <div className="flex items-center gap-4">
           <button 
             onClick={onClose}
-            className="p-2 -ml-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors group"
-            title="Back to Browser"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+            title="Back to New Tab"
           >
-            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowLeft size={18} />
           </button>
           
-          <div className="h-8 w-px bg-slate-200"></div>
+          <div className="h-6 w-px bg-slate-200"></div>
 
-          {/* Logo / Brand */}
-          <div className="font-bold text-lg text-slate-900 tracking-tight flex items-center gap-3">
-             <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/20">
-                <Bot size={18} className="text-white"/>
+          <div className="flex items-center gap-2">
+             <div className="w-7 h-7 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
+                <Bot size={16} className="text-white"/>
              </div>
-             <span className="hidden md:inline">Riza</span>
-          </div>
-          
-          {/* Minimalist Workspace Switcher */}
-          <div className="flex bg-slate-100 rounded-lg p-1 ml-4 gap-1 border border-slate-200">
-            {[
-              { id: WorkspaceMode.QUEUE, icon: <Inbox size={14} />, label: 'Queue' },
-              { id: WorkspaceMode.TICKET, icon: <MessageSquare size={14} />, label: 'Ticket #4492' },
-              { id: WorkspaceMode.ANALYTICS, icon: <Activity size={14} />, label: 'Analytics' },
-              { id: WorkspaceMode.KNOWLEDGE, icon: <BookOpen size={14} />, label: 'Knowledge' },
-            ].map(tab => (
-                 <button 
-                    key={tab.id}
-                    onClick={() => setActiveMode(tab.id as WorkspaceMode)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${activeMode === tab.id ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
-                >
-                    {tab.icon} {tab.label}
-                </button>
-            ))}
+             <span className="font-bold text-slate-900 tracking-tight hidden md:inline">Riza</span>
           </div>
         </div>
 
-        {/* Simplified Intent Bar */}
-        <div className="flex-1 max-w-xl mx-8 relative group">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search size={14} className="text-slate-400 group-focus-within:text-teal-600 transition-colors" />
-            </div>
-            <input 
-                type="text" 
-                placeholder="Ask Riza about tickets, policies, or customer history..." 
-                className="w-full bg-slate-100 border border-transparent rounded-full py-2 pl-9 pr-4 text-sm text-slate-800 focus:outline-none focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all placeholder-slate-400"
-            />
+        {/* Intent Bar (Command Center) */}
+        <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-xl top-1/2 -translate-y-1/2">
+             <div className={`relative group transition-all duration-300 ${intentState !== 'idle' ? 'scale-105' : ''}`}>
+                 <div className={`absolute inset-0 bg-gradient-to-r from-teal-500/20 to-blue-500/20 rounded-lg blur-md opacity-0 transition-opacity ${intentState !== 'idle' ? 'opacity-100' : 'group-focus-within:opacity-50'}`}></div>
+                 <div className="relative flex items-center bg-slate-100 border border-slate-200 rounded-lg overflow-hidden group-focus-within:bg-white group-focus-within:border-teal-500/50 group-focus-within:shadow-md transition-all">
+                     <div className="pl-3 text-slate-400 group-focus-within:text-teal-600">
+                         {intentState === 'listening' ? <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"/> : <Command size={14} />}
+                     </div>
+                     <input 
+                         type="text" 
+                         placeholder="Describe a task, search, or enter a command..." 
+                         onFocus={() => setIntentState('listening')}
+                         onBlur={() => setIntentState('idle')}
+                         className="w-full bg-transparent border-none py-1.5 px-3 text-sm text-slate-800 focus:outline-none placeholder-slate-400"
+                     />
+                     <div className="pr-3 flex items-center gap-2">
+                         {intentState === 'listening' && <span className="text-[10px] text-teal-600 font-bold uppercase animate-pulse">Listening</span>}
+                         <span className="text-[10px] text-slate-400 font-mono border border-slate-200 rounded px-1.5 bg-white">/</span>
+                     </div>
+                 </div>
+             </div>
         </div>
 
         {/* User / Status */}
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-[10px] font-bold text-green-700 tracking-wide uppercase">Online</span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-200 to-slate-300 border border-white shadow-sm"></div>
+             <div className="flex items-center gap-2 px-2 py-1 bg-green-50 rounded border border-green-100">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-[10px] font-bold text-green-700 uppercase">Online</span>
+             </div>
+             <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+                 <div className="w-full h-full bg-gradient-to-tr from-slate-300 to-slate-100"></div>
+             </div>
         </div>
       </div>
 
-      {/* Main Layout */}
+      {/* 3-Column Main Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Simplified Left Nav (Rail) */}
-        <div className="w-16 bg-white border-r border-slate-200 flex flex-col items-center py-6 gap-8 shrink-0">
-            <div className="text-slate-400 hover:text-teal-600 cursor-pointer transition-colors"><Inbox size={20} /></div>
-            <div className="text-slate-400 hover:text-teal-600 cursor-pointer transition-colors"><Users size={20} /></div>
-            <div className="text-slate-400 hover:text-teal-600 cursor-pointer transition-colors"><BookOpen size={20} /></div>
-            <div className="mt-auto text-slate-400 hover:text-teal-600 cursor-pointer transition-colors"><Settings size={20} /></div>
+        {/* Left Rail */}
+        <LeftRail currentMode={activeMode} onNavigate={setActiveMode} />
+
+        {/* Main Canvas */}
+        <div className="flex-1 flex flex-col min-w-0 bg-slate-50 relative z-0 shadow-inner">
+            {renderWorkspace()}
         </div>
 
-        {/* Canvas Area */}
-        <div className="flex-1 flex overflow-hidden relative bg-slate-50">
-            {renderWorkspace()}
-            
-            {/* Agent Sidebar */}
-            <AgentSidebar mode={activeMode} contextData={getContextData()} />
-        </div>
+        {/* Right Rail */}
+        <RightRail mode={activeMode} contextData={getContextData()} />
       </div>
     </div>
   );

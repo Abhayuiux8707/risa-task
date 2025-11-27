@@ -2,7 +2,8 @@ export enum WorkspaceMode {
   QUEUE = 'QUEUE',
   TICKET = 'TICKET',
   ANALYTICS = 'ANALYTICS',
-  KNOWLEDGE = 'KNOWLEDGE'
+  KNOWLEDGE = 'KNOWLEDGE',
+  ESCALATION = 'ESCALATION'
 }
 
 export interface Ticket {

@@ -126,7 +126,7 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({ mode, contextData }) => {
         {isLoading && (
           <div className="flex items-start">
              <div className="bg-white text-slate-500 border border-slate-200 rounded-2xl rounded-bl-none p-3 text-sm animate-pulse shadow-sm">
-               <span className="font-mono text-xs text-teal-600">> THINKING...</span>
+               <span className="font-mono text-xs text-teal-600">&gt; THINKING...</span>
              </div>
           </div>
         )}

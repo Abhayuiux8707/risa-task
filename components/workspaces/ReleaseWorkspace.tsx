@@ -28,9 +28,17 @@ const interventionLog = [
   { id: 3, time: '11:45', tool: 'Zendesk', action: 'Send Reply', user: 'Sarah J.', reason: 'Tone Adjustment', impact: 'Medium' },
 ];
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
 // Simple Error Boundary Component for the Chart Section
-class ChartErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
-  constructor(props: any) {
+class ChartErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
