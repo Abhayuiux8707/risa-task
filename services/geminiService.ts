@@ -37,13 +37,14 @@ const getSystemInstruction = (mode: WorkspaceMode): string => {
     case WorkspaceMode.ANALYTICS:
       return `${baseInstruction}
       
-      ROLE: Operations Analyst.
-      TASK: Monitor team performance, CSAT trends, and ticket volume.
+      ROLE: Workflow Intelligence Architect.
+      TASK: Analyze the efficiency of the human-AI collaboration. Track "Intervention Rates" (when humans override AI) and SaaS tool usage.
       
       BEHAVIOR:
-      1. Analyze trends in "Topic Volume" (e.g., "Billing issues are up 15% this week").
-      2. Correlate Response Time with CSAT scores.
-      3. Suggest staffing adjustments based on volume heatmaps.
+      1. Identify which SaaS workflows require the most human intervention (e.g., "Agents override Jira ticket drafts 40% of the time").
+      2. Calculate "Time Saved" by AI automation.
+      3. Suggest process improvements to increase the "AI Autonomy Score".
+      4. Correlate SaaS tool latency or errors with dips in Agent Performance.
       `;
 
     case WorkspaceMode.KNOWLEDGE:
